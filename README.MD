@@ -2,6 +2,16 @@
 
 > A clean, minimal MCP wrapper around the Hacker News API — built to showcase the Modular Contract Protocol (MCP) structure, typed contracts, and LLM-compatible interface.
 
+## 🌐 Live Demo
+
+🟢 Deployed at: [https://mcp-news-server.onrender.com](https://mcp-news-server.onrender.com)
+
+### Try It Now
+
+- [GET /api/listTopStories](https://mcp-news-server.onrender.com/api/listTopStories)
+- [GET /api/getStory/8863](https://mcp-news-server.onrender.com/api/getStory/8863)
+- [GET /openapi.json](https://mcp-news-server.onrender.com/openapi.json)
+
 ## 🚀 What is This?
 
 This project demonstrates how to transform an existing REST API into an **MCP-compliant server**. It wraps the [Hacker News API](https://github.com/HackerNews/API) using modular components:
@@ -193,7 +203,7 @@ export const openApiDoc = generateOpenApiDocument(registry.definitions, {
 ## 🛠️ Local Setup
 
 ```bash
-git clone https://github.com/yourusername/mcp-news-server
+git clone https://github.com/rajeshdh/mcp-news-server
 cd mcp-news-server
 npm install
 npm run dev
