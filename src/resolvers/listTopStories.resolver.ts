@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import {
   listTopStoriesInput,
   listTopStoriesOutput,
-} from "../contracts/listTopStories.contract";
-import { fetchTopStoryIds } from "../utils/hnClient";
+} from "../contracts/listTopStories.contract.js";
+import { fetchTopStoryIds } from "../utils/hnClient.js";
 
 export const listTopStoriesHandler = async (req: Request, res: Response) => {
   try {

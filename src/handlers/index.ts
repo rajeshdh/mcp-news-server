@@ -1,6 +1,6 @@
 import express from "express";
-import { listTopStoriesHandler } from "../resolvers/listTopStories.resolver";
-import { getStoryHandler } from "../resolvers/getStory.resolver";
+import { listTopStoriesHandler } from "../resolvers/listTopStories.resolver.js";
+import { getStoryHandler } from "../resolvers/getStory.resolver.js";
 
 export const handler = express.Router();
 

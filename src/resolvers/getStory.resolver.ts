@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
-import { getStoryInput, getStoryOutput } from "../contracts/getStory.contract";
-import { fetchStoryById } from "../utils/hnClient";
+import {
+  getStoryInput,
+  getStoryOutput,
+} from "../contracts/getStory.contract.js";
+import { fetchStoryById } from "../utils/hnClient.js";
 
 export const getStoryHandler = async (req: Request, res: Response) => {
   try {

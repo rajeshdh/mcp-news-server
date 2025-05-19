@@ -12,21 +12,18 @@
 - [GET /api/getStory/8863](https://mcp-news-server.onrender.com/api/getStory/8863)
 - [GET /openapi.json](https://mcp-news-server.onrender.com/openapi.json)
 
+---
+
 ## 🚀 What is This?
 
 This project demonstrates how to transform an existing REST API into an **MCP-compliant server**. It wraps the [Hacker News API](https://github.com/HackerNews/API) using modular components:
 
-- **Contracts** defined with `zod` (input/output validation)
-- **Resolvers** for logic
+- **Contracts** defined with `zod` and `zod-openapi` for typed and documented inputs/outputs
+- **Resolvers** for business logic
 - **Handlers** for HTTP routing
+- **OpenAPI integration** for LLM function calling
 
-Instead of directly exposing REST routes, the MCP pattern enforces a strict schema-first approach. Each action is a callable unit with clear input/output, making it:
-
-- Easy to test
-- Safe to validate
-- Ready to integrate with **LLMs and autonomous agents**
-
-My goal with this wrapper is to **learn about MCPs**, and the **end-to-end process** of turning raw REST APIs into structured MCP actions, and prepare these for the **MCP marketplace** — where tools and agents can discover and use them programmatically.
+My goal with this wrapper is to **learn and demonstrate the full MCP process**, and prepare APIs for the **MCP marketplace** — where tools and agents can discover and use them programmatically.
 
 ---
 
@@ -34,18 +31,15 @@ My goal with this wrapper is to **learn about MCPs**, and the **end-to-end proce
 
 Traditional REST APIs:
 
-- May lack input/output schemas
-- Can have inconsistent formats or unpredictable errors
-- Are not always introspectable
+- ❌ No contracts
+- ❌ Inconsistent formats
+- ❌ Not LLM friendly
 
 MCP APIs:
 
-- ✅ **Contract-driven** (clearly defined structure via `zod`)
-- ✅ **Composable** (can be stitched into other workflows easily)
-- ✅ **LLM-friendly** (self-descriptive endpoints for agents to reason about)
-- ✅ **Modular** (contracts + logic + transport are decoupled)
-
-LLMs (like GPT) prefer calling structured functions — MCP is like giving your API a clean `function signature` they can understand.
+- ✅ Contract-driven (with Zod)
+- ✅ Composable and self-descriptive
+- ✅ LLM-ready (via OpenAPI and function schemas)
 
 ---
 
@@ -53,8 +47,24 @@ LLMs (like GPT) prefer calling structured functions — MCP is like giving your 
 
 - Node.js + Express
 - TypeScript
-- Zod (schema validation)
-- Axios (API requests)
+- Zod + `zod-openapi`
+- Axios
+- Deployed on Render
+
+---
+
+## 📁 Project Structure
+
+```
+src/
+├── contracts/                # Zod + OpenAPI metadata
+├── resolvers/                # Business logic
+├── handlers/                 # Express routes
+├── utils/                    # Hacker News client
+├── docs/openapi.ts           # OpenAPI spec generator (zod-openapi)
+├── setup/zod-openapi-init.ts # Shared zod setup with OpenAPI support
+└── server.ts                 # Main entry point
+```
 
 ---
 
@@ -67,13 +77,13 @@ Returns a list of top Hacker News story IDs.
 #### Example:
 
 ```bash
-curl http://localhost:3000/api/listTopStories
+curl https://mcp-news-server.onrender.com/api/listTopStories
 ```
 
 #### Response:
 
 ```json
-[38643, 38642, 38641, ...]
+[38643, 38642, 38641]
 ```
 
 ---
@@ -85,7 +95,7 @@ Returns full story data for a given story ID.
 #### Example:
 
 ```bash
-curl http://localhost:3000/api/getStory/8863
+curl https://mcp-news-server.onrender.com/api/getStory/8863
 ```
 
 #### Response:
@@ -104,42 +114,23 @@ curl http://localhost:3000/api/getStory/8863
 
 ---
 
-## 📁 Project Structure
-
-```
-src/
-├── contracts/       # Zod contracts for inputs/outputs
-├── resolvers/       # Business logic layer
-├── utils/           # Hacker News API client
-├── handlers/        # Express route handlers
-└── server.ts        # Main entry point
-```
-
----
-
 ## 🧠 How LLMs Can Use This
 
-Since each endpoint is schema-bound, an LLM agent can introspect the contract and:
+Each MCP endpoint is:
 
-- Validate user input before calling the API
-- Chain outputs to other tools
-- Rely on consistent structure for reasoning
+- Strictly typed
+- Schema-bound with Zod
+- Self-documenting via OpenAPI
 
-This is ideal for use in agentic workflows (e.g. LangChain, AutoGPT, ai-agent-flow).
+This makes it ideal for:
 
-You could expose these endpoints as `functions` in OpenAI or Claude’s API format for:
-
-- News summarization agents
-- Fact-checking bots
-- Research assistants
+- LLM agents (OpenAI, Claude)
+- LangChain tools
+- ai-agent-flow pipelines
 
 ---
 
-## 🤖 Function Calling Integration (OpenAI / Claude)
-
-You can easily host this API and plug it into OpenAI or Claude using their function-calling structure.
-
-### Example: OpenAI Function Schema for `/getStory`
+## 🤖 Function Calling Example (OpenAI / Claude)
 
 ```json
 {
@@ -158,45 +149,22 @@ You can easily host this API and plug it into OpenAI or Claude using their funct
 }
 ```
 
-In your function-calling agent, point this to:
-
-```
-GET https://your-deployed-api.com/api/getStory/:id
-```
-
-You can wrap the fetch logic using tools like:
-
-- `functions` field in OpenAI Chat API
-- LangChain's `RequestsGetTool`
-- ai-agent-flow's `HttpCallNode`
+➡️ Point to:
+`GET https://mcp-news-server.onrender.com/api/getStory/:id`
 
 ---
 
-## 🧪 Optional: OpenAPI / JSON Schema Export
-
-To make your MCP server compatible with Swagger UI, RapidAPI, or agent frameworks that consume OpenAPI:
-
-Install:
+## 📄 OpenAPI Schema
 
 ```bash
-npm install zod-to-openapi
+curl https://mcp-news-server.onrender.com/openapi.json
 ```
 
-Then generate OpenAPI docs from your zod contracts:
+This endpoint can be used in:
 
-```ts
-import { generateOpenApiDocument, OpenAPIRegistry } from 'zod-to-openapi';
-import { getStoryInput, getStoryOutput } from './contracts/getStory.contract';
-
-const registry = new OpenAPIRegistry();
-registry.registerPath({ ... }); // define paths, schemas, and responses
-
-export const openApiDoc = generateOpenApiDocument(registry.definitions, {
-  openapi: '3.0.0',
-  info: { title: 'MCP News Server', version: '1.0.0' },
-  servers: [{ url: 'https://your-deployed-api.com' }],
-});
-```
+- Swagger UI
+- API clients (Postman, Insomnia)
+- LLM frameworks for function discovery
 
 ---
 
@@ -211,14 +179,12 @@ npm run dev
 
 ---
 
-## ✨ Try It Out
+## ✨ What You Can Build with This
 
-- [ ] Explore `/listTopStories`
-- [ ] Try `/getStory/:id`
-- [ ] Plug into an LLM workflow
-- [ ] Add search or comments support next
-- [ ] Generate OpenAPI JSON from contracts
-- [ ] Register your MCP actions in a public agent marketplace
+- A summarizer tool for top HN stories
+- A GPT agent that fetches and ranks HN stories
+- A fact-checking or news validation agent
+- Your own open MCP marketplace entry!
 
 ---
 
